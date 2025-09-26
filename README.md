@@ -10,7 +10,7 @@ Capas Múltiples: Configuración para consumir y visualizar diferentes tipos de 
 
 Capa Vectorial (GeoJSON): Carga de polígonos (crecimientoG.geojson) que representan la expansión urbana de Cancún por periodos.
 
-    Simbología Temática: Aplicación de una escala de color cuantitativa/categórica utilizando la expresión ['match'] de Mapbox, basada en la propiedad "LUSTRO" (valores de 1975 a 2025).
+Simbología Temática: Aplicación de una escala de color cuantitativa/categórica utilizando la expresión ['match'] de Mapbox, basada en la propiedad "LUSTRO" (valores de 1975 a 2025).
 
 Leyenda Dinámica: Inclusión de un componente HTML/CSS/JS para mostrar la leyenda correspondiente a la escala de color aplicada a la capa GeoJSON.
 
