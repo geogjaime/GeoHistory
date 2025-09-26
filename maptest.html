@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Mapa de Cancún con capa WMS</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+         /* ESTILOS PARA LA LEYENDA */
+        #leyenda {
+            background-color: #fff;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 4px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            position: absolute; /* Posicionamiento flotante */
+            bottom: 20px;       /* Distancia desde abajo */
+            right: 20px;        /* Distancia desde la derecha */
+            z-index: 1;         /* Asegura que esté sobre el mapa */
+            font-family: sans-serif;
+            font-size: 14px;
+        }
+        .leyenda-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .color-caja {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            border: 1px solid #444; /* Borde para colores claros */
+        }
+    </style>
+
+</head>
+<body>
+
+<div id='map'></div>
+<div id='leyenda'>
+    <h4>Lustro de Crecimiento</h4>
+</div>
+
+<script>
+    // Tu token de acceso de Mapbox
+    mapboxgl.accessToken = 'pk.eyJ1IjoiamFpbWV6YXAiLCJhIjoiY21meDJudTVmMDVsZzJscTk5b3pjZjI3MyJ9.eB0mgPkWi55L5objQzX4sg';
+
+    // Inicializa el mapa centrado en Cancún
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11', // Puedes usar otro estilo base
+        center: [-86.8515, 21.1], // Coordenadas aproximadas de Cancún
+        zoom: 10
+    });
+
+    //carga de un geojson
+    map.on('load', () => {
+    // 1. Añadir la fuente GeoJSON
+    map.addSource('poligonos-lustro', {
+        'type': 'geojson',
+        'data': './datos/crecimientoG.geojson' // REEMPLAZA ESTA RUTA
+        // Si tu GeoJSON es muy grande, considera usar 'data' con el objeto JSON directamente
+        // o migrar a Vector Tiles como se recomendó.
+    });
+
+    // 2. Añadir la capa de renderizado con el estilo
+ 
+       map.addLayer({
+        'id': 'capa-poligonos-lustro',
+        'type': 'fill', // El tipo 'fill' se usa para polígonos
+        'source': 'poligonos-lustro',
+        'paint': {
+            // Estilo de relleno: aplica la escala de color
+            'fill-color': [
+                'match',        // Inicia la expresión de correspondencia
+                ['get', 'LUSTRO'], // Obtiene el valor de la columna 'lustro'
+                // Pares valor : color
+                1975, '#ffffcc',  // Un color muy claro (inicio de la escala)
+                1980, '#ffeda0',
+                1985, '#fed976',
+                1990, '#feb24c',
+                1995, '#fd8d3c',
+                2000, '#fc4e2a',
+                2005, '#e31a1c',
+                2010, '#bd0026',
+                2015, '#800026',  // Un color oscuro e intenso
+                2020, '#54278f',
+                2025, '#2d004b',  // El color más oscuro (final de la escala)
+                /* Valor por defecto si no coincide */
+                '#ccc'            // Gris para cualquier valor no listado
+            ],
+            'fill-opacity': 0.7, // Opacidad de los polígonos (puedes ajustar)
+            
+        },
+        // Posicionamiento de la capa: opcionalmente sobre la capa WMS
+        // 'slot': 'middle'
+    });
+     // ==========================================================
+    // CÓDIGO PARA GENERAR LA LEYENDA
+    // ==========================================================
+    
+    // Define los mismos valores y colores que usaste en la expresión 'match'
+    const leyendaData = [
+        { valor: '1975', color: '#ffffcc' },
+        { valor: '1980', color: '#ffeda0' },
+        { valor: '1985', color: '#fed976' },
+        { valor: '1990', color: '#feb24c' },
+        { valor: '1995', color: '#fd8d3c' },
+        { valor: '2000', color: '#fc4e2a' },
+        { valor: '2005', color: '#e31a1c' },
+        { valor: '2010', color: '#bd0026' },
+        { valor: '2015', color: '#800026' },
+        { valor: '2020', color: '#54278f' },
+        { valor: '2025', color: '#2d004b' }
+    ];
+
+    const leyendaDiv = document.getElementById('leyenda');
+
+    leyendaData.forEach(item => {
+        // Crea el contenedor para cada elemento de la leyenda
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'leyenda-item';
+
+        // Crea la caja de color
+        const colorCaja = document.createElement('div');
+        colorCaja.className = 'color-caja';
+        colorCaja.style.backgroundColor = item.color;
+
+        // Crea el texto del valor
+        const valorTexto = document.createTextNode(item.valor);
+
+        // Junta los elementos
+        itemDiv.appendChild(colorCaja);
+        itemDiv.appendChild(valorTexto);
+        leyendaDiv.appendChild(itemDiv);
+    });
+
+    // ==========================================================
+    // FIN CÓDIGO LEYENDA
+    // ==========================================================
+});
+   
+</script>
+ 
+</body>
+</html>
